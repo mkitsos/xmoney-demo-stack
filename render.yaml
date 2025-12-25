@@ -27,7 +27,10 @@ services:
       sizeGB: 10
     envVars:
       - key: WORDPRESS_DB_HOST
-        value: demo-db:3306
+        fromService:
+          name: demo-db
+          type: pserv
+          property: host
       - key: WORDPRESS_DB_NAME
         value: wordpress
       - key: WORDPRESS_DB_USER
