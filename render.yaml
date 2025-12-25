@@ -12,6 +12,8 @@ services:
     envVars:
       - key: MYSQL_ROOT_PASSWORD
         generateValue: true
+      - key: MYSQL_ROOT_HOST
+        value: "%"
 
   - type: web
     name: wp-web
