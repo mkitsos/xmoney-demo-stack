@@ -17,6 +17,7 @@ services:
     runtime: docker
     plan: starter
     dockerfilePath: ./wp/Dockerfile
+    dockerContext: ./wp
     disk:
       name: wp-content
       mountPath: /var/www/html/wp-content
