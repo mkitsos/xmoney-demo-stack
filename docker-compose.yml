@@ -1,0 +1,72 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  wp:
+    build: ./wp
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: root_password
+      WORDPRESS_CONFIG_EXTRA: |
+        define('DISALLOW_FILE_EDIT', true);
+        define('WP_MEMORY_LIMIT', '256M');
+    ports:
+      - "8080:80"
+    volumes:
+      - wp_content:/var/www/html/wp-content
+      - /Users/mkitsos/Code/xmoney-woocommerce:/var/www/html/wp-content/plugins/xmoney-woocommerce
+
+  # PrestaShop disabled
+  # prestashop:
+  #   build: ./prestashop
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   environment:
+  #     DB_SERVER: db
+  #     DB_NAME: prestashop
+  #     DB_USER: root
+  #     DB_PASSWD: root_password
+  #   ports:
+  #     - "8081:80"
+  #   volumes:
+  #     - ps_data:/var/www/html
+
+  # OpenCart disabled
+  # opencart:
+  #   build: ./opencart
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   environment:
+  #     OPENCART_DB_HOST: db:3306
+  #     OPENCART_DB_NAME: opencart
+  #     OPENCART_DB_USER: root
+  #     OPENCART_DB_PASSWORD: root_password
+  #   ports:
+  #     - "8082:80"
+  #   volumes:
+  #     - oc_data:/var/www/html
+
+volumes:
+  db_data:
+  wp_content:
+  # ps_data:
+  # oc_data:

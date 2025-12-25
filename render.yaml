@@ -1,0 +1,85 @@
+services:
+  - type: pserv
+    name: demo-db
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./db.Dockerfile
+    disk:
+      name: db-data
+      mountPath: /var/lib/mysql
+      sizeGB: 10
+    envVars:
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true
+
+  - type: web
+    name: wp-web
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./wp/Dockerfile
+    disk:
+      name: wp-content
+      mountPath: /var/www/html/wp-content
+      sizeGB: 10
+    envVars:
+      - key: WORDPRESS_DB_HOST
+        value: demo-db:3306
+      - key: WORDPRESS_DB_NAME
+        value: wordpress
+      - key: WORDPRESS_DB_USER
+        value: root
+      - key: WORDPRESS_DB_PASSWORD
+        fromService:
+          name: demo-db
+          type: pserv
+          envVarKey: MYSQL_ROOT_PASSWORD
+      - key: WORDPRESS_CONFIG_EXTRA
+        value: |
+          define('DISALLOW_FILE_EDIT', true);
+          define('WP_MEMORY_LIMIT', '256M');
+
+  # PrestaShop disabled
+  # - type: web
+  #   name: ps-web
+  #   runtime: docker
+  #   plan: starter
+  #   dockerfilePath: ./prestashop/Dockerfile
+  #   disk:
+  #     name: ps-data
+  #     mountPath: /var/www/html
+  #     sizeGB: 10
+  #   envVars:
+  #     - key: DB_SERVER
+  #       value: demo-db
+  #     - key: DB_NAME
+  #       value: prestashop
+  #     - key: DB_USER
+  #       value: root
+  #     - key: DB_PASSWD
+  #       fromService:
+  #         name: demo-db
+  #         type: pserv
+  #         envVarKey: MYSQL_ROOT_PASSWORD
+
+  # OpenCart disabled
+  # - type: web
+  #   name: oc-web
+  #   runtime: docker
+  #   plan: starter
+  #   dockerfilePath: ./opencart/Dockerfile
+  #   disk:
+  #     name: oc-data
+  #     mountPath: /var/www/html
+  #     sizeGB: 10
+  #   envVars:
+  #     - key: OPENCART_DB_HOST
+  #       value: demo-db:3306
+  #     - key: OPENCART_DB_NAME
+  #       value: opencart
+  #     - key: OPENCART_DB_USER
+  #       value: root
+  #     - key: OPENCART_DB_PASSWORD
+  #       fromService:
+  #         name: demo-db
+  #         type: pserv
+  #         envVarKey: MYSQL_ROOT_PASSWORD
