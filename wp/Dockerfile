@@ -12,13 +12,3 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 COPY php.ini /usr/local/etc/php/conf.d/custom.ini
-
-# Copy initialization scripts
-COPY init-wordpress.sh /var/www/html/
-COPY install-woocommerce.sh /var/www/html/
-COPY add-sample-products.php /var/www/html/
-RUN chmod +x /var/www/html/init-wordpress.sh \
-  && chmod +x /var/www/html/install-woocommerce.sh
-
-# Copy xMoney WooCommerce plugin
-COPY plugins/xmoney-woocommerce /var/www/html/wp-content/plugins/xmoney-woocommerce

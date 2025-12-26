@@ -26,28 +26,43 @@ services:
       WORDPRESS_DB_PASSWORD: root_password
       WORDPRESS_CONFIG_EXTRA: |
         define('DISALLOW_FILE_EDIT', true);
-        define('WP_MEMORY_LIMIT', '256M');
+        define('WP_MEMORY_LIMIT', '512M');
+        define('DISABLE_WP_CRON', true);
+        define('AUTOMATIC_UPDATER_DISABLED', true);
+        define('WP_AUTO_UPDATE_CORE', false);
+        define('WP_POST_REVISIONS', false);
+        define('EMPTY_TRASH_DAYS', 0);
     ports:
       - "8080:80"
     volumes:
       - wp_content:/var/www/html/wp-content
       - /Users/mkitsos/Code/xmoney-woocommerce:/var/www/html/wp-content/plugins/xmoney-woocommerce
 
-  # PrestaShop disabled
-  # prestashop:
-  #   build: ./prestashop
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #   environment:
-  #     DB_SERVER: db
-  #     DB_NAME: prestashop
-  #     DB_USER: root
-  #     DB_PASSWD: root_password
-  #   ports:
-  #     - "8081:80"
-  #   volumes:
-  #     - ps_data:/var/www/html
+  prestashop:
+    build: ./prestashop
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_SERVER: db
+      DB_NAME: prestashop
+      DB_USER: root
+      DB_PASSWD: root_password
+      PS_DEV_MODE: 1
+      PS_INSTALL_AUTO: 1
+      PS_DOMAIN: localhost:8081
+      PS_FOLDER_ADMIN: admin
+      PS_FOLDER_INSTALL: install
+      PS_COUNTRY: GR
+      PS_LANGUAGE: en
+      PS_ENABLE_SSL: 0
+      ADMIN_MAIL: admin@example.com
+      ADMIN_PASSWD: admin123
+    ports:
+      - "8081:80"
+    volumes:
+      - ps_data:/var/www/html
+      - /Users/mkitsos/Code/xmoney-prestashop:/var/www/html/modules/xmoney
 
   # OpenCart disabled
   # opencart:
@@ -68,5 +83,5 @@ services:
 volumes:
   db_data:
   wp_content:
-  # ps_data:
+  ps_data:
   # oc_data:
